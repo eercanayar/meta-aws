@@ -42,13 +42,17 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       FunctionName: !Ref EnvironmentName
+      Environment:
+        Variables:
+          REGION: !Ref 'AWS::Region'
       Role: !GetAtt LambdaExecutionRole.Arn
       Handler: index.lambda_handler
       Code: 
         ZipFile: | 
           import boto3
           import json
-          client = boto3.client('iot', region_name="us-east-2")
+          import os
+          client = boto3.client('iot', region_name=os.environ['REGION'])
           def lambda_handler(event, context):
               response = client.list_things(
                   maxResults=123,
