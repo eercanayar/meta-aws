@@ -116,10 +116,10 @@ class LiveFeedView extends React.Component {
 
     async componentDidMount() {
         // Create KVS client
-        AWS.config.region = 'us-east-2'; // Region
+        AWS.config.region = 'eu-west-1'; // Region
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: 'us-east-2:xxxxxxxxxxxxxx',
-          RoleArn: "arn:aws:iam::xxxxxxx:role/xxxxxxx",
+          IdentityPoolId: 'eu-west-1:a5404cd0-5ed4-4525-bf3a-fa823070cb8e',
+          RoleArn: "arn:aws:iam::271758595693:role/gg-demo3-CognitoUnAuthorizedRole-1AEVOGURC7Z8N",
           });
         const kinesisVideoClient = new AWS.KinesisVideo({
             region: this.props.formValues.region,
@@ -339,7 +339,7 @@ class SimpleMap extends Component {
 
   getData(){
     const _this=this;
-    axios.get('https://hcbj5osrr8.execute-api.us-east-1.amazonaws.com/v1/things',
+    axios.get('https://fksm2m1bng.execute-api.eu-west-1.amazonaws.com/v1/things',
               {withCredentials: false})
       .then(function (response) {
         _this.setState({
@@ -349,7 +349,7 @@ class SimpleMap extends Component {
             accessKeyId: "",
             secretAccessKey: "",
             sessionToken: "",
-            region: "us-east-2"
+            region: "eu-west-1"
   }
         });
       })
@@ -406,7 +406,7 @@ class SimpleMap extends Component {
         <div>
           <div style={{ height: '100vh', width: '80%', float: 'left'}}>
           <GoogleMap
-            bootstrapURLKeys={{ key: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" }}
+            bootstrapURLKeys={{ key: "" }}
             center={this.state.center}
             zoom={this.state.zoom}
             options = {{disableDoubleClickZoom:false}}
