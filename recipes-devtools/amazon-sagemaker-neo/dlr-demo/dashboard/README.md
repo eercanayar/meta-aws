@@ -6,7 +6,7 @@
 ### Get services info
 
 ```
-# aws cloudformation describe-stacks  --stack-name gg-demo | jq .Stacks[0].Outputs
+# aws cloudformation describe-stacks  --stack-name gg-demo | jq '.Stacks[0].Outputs'
 [
   {
     "OutputKey": "BucketName",
@@ -32,9 +32,9 @@
 ```
 
 ### DashBoard Build Steps
-- Update CognitoIdentityCredentials configuration in Map.js ( line 121, 122)
-- Update googlemap bootstrapURLKeys or delete it for dev environment. (Map.js line 409)
-- Update RestAPI endpoint. (Map.js line 342)
+- Update CognitoIdentityCredentials configuration (in `src/Map.js` line 121, 122)
+- Update googlemap bootstrapURLKeys or delete it for dev environment. ( in `Map.js` line 409)
+- Update RestAPI endpoint. (in `Map.js` line 342)
 - npm install
 - npm run build
 
