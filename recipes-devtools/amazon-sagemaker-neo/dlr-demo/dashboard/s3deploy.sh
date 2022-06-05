@@ -1,3 +1,2 @@
-#go get https://github.com/bep/s3deploy
-#cp trailer_hd.mp4 build/static
-s3deploy -bucket greengrass-cloud-demo.www -region aws-global -config s3deploy.yml  -public-access -source build
+
+s3deploy -bucket gg-demo-s3bucketforwebsitecontent-1pmsx3mquv7qq -region eu-west-1 -config s3deploy.yml -acl private -source build -distribution-id E1IPW2DRWP6564

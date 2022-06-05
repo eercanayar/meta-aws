@@ -226,10 +226,12 @@ Resources:
   S3BucketForWebsiteContent:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: index.html
+      AccessControl: Private
+      PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
   WebsiteCDN:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -243,14 +245,32 @@ Resources:
           ViewerProtocolPolicy: allow-all
         DefaultRootObject: index.html
         Origins:
-        - CustomOriginConfig:
-            HTTPPort: '80'
-            HTTPSPort: '443'
-            OriginProtocolPolicy: https-only
-          DomainName: !Join ['', [!Ref 'S3BucketForWebsiteContent', !FindInMap [Region2S3WebsiteSuffix,
+        - DomainName: !Join ['', [!Ref 'S3BucketForWebsiteContent', !FindInMap [Region2S3WebsiteSuffix,
                 !Ref 'AWS::Region', Suffix]]]
           Id: only-origin
+          S3OriginConfig:
+              OriginAccessIdentity: !Join [ "", [ "origin-access-identity/cloudfront/", !Ref TheCloudFrontOriginAccessIdentity ] ]
+        
+  TheCloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: !Sub 'CloudFront OAI for ${S3BucketForWebsiteContent}'
 
+  OAIBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3BucketForWebsiteContent
+      PolicyDocument:
+        Version: "2008-10-17"
+        Id: "PolicyForCloudFrontPrivateContent"
+        Statement:
+          - Action:
+              - 's3:GetObject'
+            Effect: Allow
+            Resource: !Sub "arn:aws:s3:::${S3BucketForWebsiteContent}/*"
+            Principal:
+              AWS: !Sub "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${TheCloudFrontOriginAccessIdentity}"
 Outputs:
   IdentityPoolID:
     Value: !Ref IdentityPool
@@ -260,5 +280,7 @@ Outputs:
     Value: !Ref S3BucketForWebsiteContent
   WebSite:
     Value: !GetAtt WebsiteCDN.DomainName
+  DistributionId:
+    Value: !Ref WebsiteCDN
   RestAPI:
     Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${DeployStage}/things"

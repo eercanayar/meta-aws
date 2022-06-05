@@ -39,8 +39,14 @@
 - npm run build
 
 ### Upload dashboard to s3 bucket
+
+Download `s3deploy` from: https://github.com/bep/s3deploy/releases/tag/v2.7.0
+
+Then run the following by replacing your bucket, region and CloudFront distribution ID:
+
 ```
-# s3deploy -bucket gg-demo-s3bucketforwebsitecontent-57rqul2mq15s -region us-east-2 -config s3deploy.yml  -public-access -source build
+$ s3deploy -bucket gg-demo3-s3bucketforwebsitecontent-jz4670m1bi3l -region eu-west-1 -config s3deploy.yml -acl private -source build -distribution-id E2KYYLC725TZ54
+ 
 ```
 
 ### Update device Latitude and Longitude:
