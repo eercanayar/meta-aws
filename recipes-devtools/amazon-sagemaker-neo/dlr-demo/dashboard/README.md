@@ -10,7 +10,7 @@
 [
   {
     "OutputKey": "BucketName",
-    "OutputValue": "gg-demo-s3bucketforwebsitecontent-57rqul2mq15s"
+    "OutputValue": "gg-demo-s3bucketforwebsitecontent-abcde123456"
   },
   {
     "OutputKey": "IdentityPoolRoleArn",
@@ -32,11 +32,13 @@
 ```
 
 ### DashBoard Build Steps
-- Update CognitoIdentityCredentials configuration (in `src/Map.js` line 121, 122)
-- Update googlemap bootstrapURLKeys or delete it for dev environment. ( in `Map.js` line 409)
-- Update RestAPI endpoint. (in `Map.js` line 342)
-- npm install
-- npm run build
+[] Set `window.REGION` in `src/Map.js` line 23
+[] Update CognitoIdentityCredentials configuration in `src/Map.js` line 121, 122
+[] Update googlemap `bootstrapURLKeys` or delete it for dev environment in `Map.js` line 409
+[] Update `lambdaUrl` in `Map.js` line 342 by getting it from CloudFormation outputs.
+[] Update `APIKey` in `Map.js` line 343 by getting it from CloudFormation outputs.
+[] npm install
+[] npm run build
 
 ### Upload dashboard to s3 bucket
 
@@ -45,7 +47,7 @@ Download `s3deploy` from: https://github.com/bep/s3deploy/releases/tag/v2.7.0
 Then run the following by replacing your bucket, region and CloudFront distribution ID:
 
 ```
-$ s3deploy -bucket gg-demo3-s3bucketforwebsitecontent-jz4670m1bi3l -region eu-west-1 -config s3deploy.yml -acl private -source build -distribution-id E2KYYLC725TZ54
+$ s3deploy -bucket gg-demo-s3bucketforwebsitecontent-abcde123456 -region eu-west-1 -config s3deploy.yml -acl private -source build -distribution-id ABCDE123456
  
 ```
 
@@ -56,6 +58,6 @@ $ s3deploy -bucket gg-demo3-s3bucketforwebsitecontent-jz4670m1bi3l -region eu-we
 
 ### Delete cloud services
 ```
-# aws s3 rm  --recursive s3://gg-demo-s3bucketforwebsitecontent-57rqul2mq15s
+# aws s3 rm  --recursive s3://gg-demo-s3bucketforwebsitecontent-abcde123456
 # aws cloudformation delete-stack  --stack-name gg-demo
 ```

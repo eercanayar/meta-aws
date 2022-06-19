@@ -20,7 +20,7 @@ import axios from 'axios';
 import AWS from "aws-sdk";
 import { Role, SignalingClient } from 'amazon-kinesis-video-streams-webrtc'
 
-
+window.REGION = "eu-west-1"
 function uid() {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
@@ -116,11 +116,12 @@ class LiveFeedView extends React.Component {
 
     async componentDidMount() {
         // Create KVS client
-        AWS.config.region = 'eu-west-1'; // Region
+        AWS.config.region = window.REGION; // Region
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: 'eu-west-1:a5404cd0-5ed4-4525-bf3a-fa823070cb8e',
-          RoleArn: "arn:aws:iam::271758595693:role/gg-demo3-CognitoUnAuthorizedRole-1AEVOGURC7Z8N",
+          IdentityPoolId: 'eu-west-1:9c44d202-00ff-4017-8332-5286515a1b0f',
+          RoleArn: "arn:aws:iam::271758595693:role/gg-demo12-CognitoUnAuthorizedRole-1BF4HMLI68AAF",
           });
+
         const kinesisVideoClient = new AWS.KinesisVideo({
             region: this.props.formValues.region,
             //accessKeyId: this.props.formValues.accessKeyId,
@@ -339,7 +340,10 @@ class SimpleMap extends Component {
 
   getData(){
     const _this=this;
-    axios.get('https://fksm2m1bng.execute-api.eu-west-1.amazonaws.com/v1/things',
+    const lambdaUrl = "https://r67c2h2ix7chaxeqxq5vytfpim0dfyxx.lambda-url.eu-west-1.on.aws/";
+    const APIKey = "9a0fca30-efc3-11ec-afe2-0a9da8593f3d";
+
+    axios.get(lambdaUrl+"/?APIKey="+APIKey,
               {withCredentials: false})
       .then(function (response) {
         _this.setState({
@@ -349,7 +353,7 @@ class SimpleMap extends Component {
             accessKeyId: "",
             secretAccessKey: "",
             sessionToken: "",
-            region: "eu-west-1"
+            region: window.REGION
   }
         });
       })
