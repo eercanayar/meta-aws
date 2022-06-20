@@ -118,10 +118,9 @@ class LiveFeedView extends React.Component {
         // Create KVS client
         AWS.config.region = window.REGION; // Region
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-          IdentityPoolId: 'eu-west-1:9c44d202-00ff-4017-8332-5286515a1b0f',
-          RoleArn: "arn:aws:iam::271758595693:role/gg-demo12-CognitoUnAuthorizedRole-1BF4HMLI68AAF",
+          IdentityPoolId: 'eu-west-1:fxxx',
+          RoleArn: "arn:aws:iam::xx:role/gg-xxxx",
           });
-
         const kinesisVideoClient = new AWS.KinesisVideo({
             region: this.props.formValues.region,
             //accessKeyId: this.props.formValues.accessKeyId,
@@ -340,10 +339,7 @@ class SimpleMap extends Component {
 
   getData(){
     const _this=this;
-    const lambdaUrl = "https://r67c2h2ix7chaxeqxq5vytfpim0dfyxx.lambda-url.eu-west-1.on.aws/";
-    const APIKey = "9a0fca30-efc3-11ec-afe2-0a9da8593f3d";
-
-    axios.get(lambdaUrl+"/?APIKey="+APIKey,
+    axios.get("https://xxxx.execute-api.eu-west-1.amazonaws.com/v1/things",
               {withCredentials: false})
       .then(function (response) {
         _this.setState({

@@ -35,8 +35,7 @@
 [] Set `window.REGION` in `src/Map.js` line 23
 [] Update CognitoIdentityCredentials configuration in `src/Map.js` line 121, 122
 [] Update googlemap `bootstrapURLKeys` or delete it for dev environment in `Map.js` line 409
-[] Update `lambdaUrl` in `Map.js` line 342 by getting it from CloudFormation outputs.
-[] Update `APIKey` in `Map.js` line 343 by getting it from CloudFormation outputs.
+[] Update RestAPI endpoint. (Map.js line 342)
 [] npm install
 [] npm run build
 

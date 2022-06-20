@@ -1,5 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
+  DeployStage:
+    Description: Enter the branch used to initiate the deployment
+    Default: v1
+    Type: String
   EnvironmentName:
     Description: Enter the branch used to initiate the deployment
     Default: aws-gg-demo
@@ -41,7 +45,6 @@ Resources:
       Environment:
         Variables:
           REGION: !Ref 'AWS::Region'
-          APIKey: !Select [2, !Split ['/', !Ref AWS::StackId]]
       Role: !GetAtt LambdaExecutionRole.Arn
       Handler: index.lambda_handler
       Code: 
@@ -52,10 +55,6 @@ Resources:
           client = boto3.client('iot', region_name=os.environ['REGION'])
           def lambda_handler(event, context):
               print(event)
-              if  not "queryStringParameters" in event or not "APIKey" in event["queryStringParameters"] or os.environ['APIKey'] != event["queryStringParameters"]['APIKey']:
-                return {
-                  'statusCode': 403,
-                }
               response = client.list_things(
                   maxResults=123,
                   usePrefixAttributeValue=False
@@ -72,7 +71,7 @@ Resources:
                   things.append(thing)
               return {
                   'statusCode': 200,
-                  'body': json.dumps({'things': things})
+                  'things': things
               }
 
       Runtime: python3.8
@@ -102,23 +101,50 @@ Resources:
             - iot:*
             Resource: '*'
 
-
-  ThingListLambdaUrl:
-    Type: AWS::Lambda::Url
+  apiGateway:
+    Type: AWS::ApiGateway::RestApi
     Properties:
-      AuthType: NONE
-      Cors:
-        AllowOrigins: 
-          - "*"
-      TargetFunctionArn: !GetAtt ThingsListFunction.Arn
+      Body:
+        openapi: "3.0.1"
+        info:
+          title: !Ref EnvironmentName
+        paths:
+          /things:
+            get:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                "200":
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                payloadFormatVersion: "1.0"
+                #connectionId: !Ref HttpApiVPCLink
+                #connectionType: "VPC_LINK"
+                type: "AWS"
+                httpMethod: "POST"
+                uri: !Sub
+                  - arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations
+                  - lambdaArn: !GetAtt ThingsListFunction.Arn
 
-  FunctionUrlPermission:
+  lambdaApiGatewayInvoke:
     Type: AWS::Lambda::Permission
     Properties:
-      Action: lambda:InvokeFunctionUrl
-      FunctionName: !GetAtt ThingsListFunction.Arn
-      FunctionUrlAuthType: NONE
-      Principal: "*"
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ThingsListFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*/GET/things
 
   # Create a role for unauthorized acces to AWS resources. Very limited access. Only allows users in the previously created Identity Pool
   CognitoUnAuthorizedRole:
@@ -193,6 +219,14 @@ Resources:
       Roles:
         authenticated: !GetAtt CognitoAuthorizedRole.Arn
         unauthenticated: !GetAtt CognitoUnAuthorizedRole.Arn
+        
+  apiGatewayDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - apiGateway
+    Properties:
+      RestApiId: !Ref apiGateway
+      StageName: !Ref DeployStage
 
   S3BucketForWebsiteContent:
     Type: AWS::S3::Bucket
@@ -254,7 +288,5 @@ Outputs:
     Value: !GetAtt WebsiteCDN.DomainName
   DistributionId:
     Value: !Ref WebsiteCDN
-  FunctionURL:
-    Value: !GetAtt ThingListLambdaUrl.FunctionUrl
-  APIKey:
-    Value: !Select [2, !Split ['/', !Ref AWS::StackId]]
+  RestAPI:
+    Value: !Sub "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com/${DeployStage}/things"
