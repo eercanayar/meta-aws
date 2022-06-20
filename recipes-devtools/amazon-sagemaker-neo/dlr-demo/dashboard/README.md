@@ -32,12 +32,12 @@
 ```
 
 ### DashBoard Build Steps
-[] Set `window.REGION` in `src/Map.js` line 23
-[] Update CognitoIdentityCredentials configuration in `src/Map.js` line 121, 122
-[] Update googlemap `bootstrapURLKeys` or delete it for dev environment in `Map.js` line 409
-[] Update RestAPI endpoint. (Map.js line 342)
-[] npm install
-[] npm run build
+- [ ] Set `window.REGION` in `src/Map.js` line 23
+- [ ] Update CognitoIdentityCredentials configuration in `src/Map.js` line 121, 122
+- [ ] Update googlemap `bootstrapURLKeys` or delete it for dev environment in `Map.js` line 409
+- [ ] Update RestAPI endpoint. (Map.js line 342)
+- [ ] npm install
+- [ ] npm run build
 
 ### Upload dashboard to s3 bucket
 
